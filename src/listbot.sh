@@ -22,7 +22,7 @@ wait
 
 # Sanity Check
 myCVE=$(grep -c "CVE\|CAN" < cve.yaml)
-myIPREP=$(grep -c -P "^\b(?:\d{1,3}\.){3}\d{1,3}\b" < iprep.yaml)
+myIPREP=$(grep -c -P "\b(?:\d{1,3}\.){3}\d{1,3}\b" < iprep.yaml)
 
 if [ $myCVE -gt 5000 ] && [ $myIPREP -gt 500000 ];
   then
