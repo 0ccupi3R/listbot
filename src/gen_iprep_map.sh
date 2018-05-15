@@ -29,7 +29,7 @@ local myHOST=$(echo $2 | cut -d "/" -f3)
             echo "[$myRED ERROR $myWHITE]"
         fi
     else
-     echo "[$myRED ERROR $myWHITE]"
+      echo "[$myRED ERROR $myWHITE]"
   fi
 }
 
@@ -40,12 +40,15 @@ local myFILE=$1
 
   if [ -f $myFILE ];
     then
-      myZIP=$(file $myFILE | grep -c "Zip")
-      if [ "$myZIP" == "1" ]
+      myZIP=$(file $myFILE | grep -o "Zip\|gz" | uniq)
+      if [ "$myZIP" == "Zip" ];
         then
-          unzip -p $myFILE | grep -o -P "^\b(?:\d{1,3}\.){3}\d{1,3}/\d{1,2}\b" | xargs -I '{}' prips '{}'
+          unzip -p $myFILE | grep -o -P "\b(?:\d{1,3}\.){3}\d{1,3}/\d{1,2}\b" | xargs -I '{}' prips '{}'
+      elif [ "$myZIP" == "gz" ];
+        then
+          gunzip -c -f $myFILE | grep -o -P "\b(?:\d{1,3}\.){3}\d{1,3}/\d{1,2}\b" | xargs -I '{}' prips '{}'
         else
-          grep -o -P "^\b(?:\d{1,3}\.){3}\d{1,3}/\d{1,2}\b" $myFILE | xargs -I '{}' prips '{}'
+          grep -o -P "\b(?:\d{1,3}\.){3}\d{1,3}/\d{1,2}\b" $myFILE | xargs -I '{}' prips '{}'
       fi
   fi
 }
@@ -57,12 +60,15 @@ local myFILE=$1
 
   if [ -f $myFILE ];
     then
-      myZIP=$(file $myFILE | grep -c "Zip")
-      if [ "$myZIP" == "1" ]
+      myZIP=$(file $myFILE | grep -o "Zip\|gz" | uniq)
+      if [ "$myZIP" == "Zip" ];
         then
-          unzip -p $myFILE | grep -o -P "^\b(?:\d{1,3}\.){3}\d{1,3}\b"
+          unzip -p $myFILE | grep -o -P "\b(?:\d{1,3}\.){3}\d{1,3}\b"
+      elif [ "$myZIP" == "gz" ];
+        then
+          gunzip -c -f $myFILE | grep -o -P "\b(?:\d{1,3}\.){3}\d{1,3}\b" 
         else
-          grep -o -P "^\b(?:\d{1,3}\.){3}\d{1,3}\b" $myFILE
+          grep -o -P "\b(?:\d{1,3}\.){3}\d{1,3}\b" $myFILE
       fi
   fi
 }
@@ -88,36 +94,43 @@ local myYAMLFILE="$3.raw"
 
 # Download reputation lists
 fuDOWNLOAD "https://reputation.alienvault.com/reputation.generic" "bad reputation" "alienvault"
-fuDOWNLOAD "https://www.badips.com/get/list/any/2" "known attacker" "badips"
+fuDOWNLOAD "https://raw.githubusercontent.com/Neo23x0/signature-base/39787aaefa6b70b0be6e7dcdc425b65a716170ca/iocs/otx-c2-iocs.txt" "malware" "alienvault"
+fuDOWNLOAD "https://www.badips.com/get/list/any/2?age=90d" "known attacker" "badips"
 fuDOWNLOAD "http://osint.bambenekconsulting.com/feeds/c2-ipmasterlist.txt" "C2 server" "bambenek"
 fuDOWNLOAD "https://lists.blocklist.de/lists/all.txt" "known attacker" "blocklist"
-fuDOWNLOAD "https://raw.githubusercontent.com/firehol/blocklist-ipsets/master/botscout_1d.ipset" "form spammer" "firehol_botscout"
+fuDOWNLOAD "https://iplists.firehol.org/files/bitcoin_nodes_30d.ipset" "bitcoin node" "firehol_bitcoin"
+fuDOWNLOAD "https://iplists.firehol.org/files/botscout_30d.ipset" "form spammer" "firehol_botscout"
 fuDOWNLOAD "https://raw.githubusercontent.com/firehol/blocklist-ipsets/master/cruzit_web_attacks.ipset" "known attacker" "firehol_cruzit"
 fuDOWNLOAD "https://raw.githubusercontent.com/firehol/blocklist-ipsets/master/malwaredomainlist.ipset" "known atttacker" "firehol_mwdomainlist"
-fuDOWNLOAD "https://raw.githubusercontent.com/firehol/blocklist-ipsets/master/proxylists_1d.ipset" "anonymizer" "firehol_proxylists"
-fuDOWNLOAD "https://raw.githubusercontent.com/firehol/blocklist-ipsets/master/proxyrss_1d.ipset" "anonymizer" "firehol_proxyrss"
-fuDOWNLOAD "https://raw.githubusercontent.com/firehol/blocklist-ipsets/master/proxyspy_1d.ipset" "anonymizer" "firehol_proxyspy"
+fuDOWNLOAD "https://raw.githubusercontent.com/firehol/blocklist-ipsets/master/proxylists_30d.ipset" "anonymizer" "firehol_proxylists"
+fuDOWNLOAD "https://raw.githubusercontent.com/firehol/blocklist-ipsets/master/proxyrss_30d.ipset" "anonymizer" "firehol_proxyrss"
+fuDOWNLOAD "https://raw.githubusercontent.com/firehol/blocklist-ipsets/master/proxyspy_30d.ipset" "anonymizer" "firehol_proxyspy"
 fuDOWNLOAD "https://raw.githubusercontent.com/firehol/blocklist-ipsets/master/ri_web_proxies_30d.ipset" "anonymizer" "firehol_web_proxies"
-fuDOWNLOAD "https://raw.githubusercontent.com/firehol/blocklist-ipsets/master/socks_proxy_7d.ipset" "anonymizer" "firehol_socks_proxy"
-fuDOWNLOAD "https://raw.githubusercontent.com/firehol/blocklist-ipsets/master/sslproxies_1d.ipset" "anonymizer" "firehol_sslproxies"
+fuDOWNLOAD "https://raw.githubusercontent.com/firehol/blocklist-ipsets/master/socks_proxy_30d.ipset" "anonymizer" "firehol_socks_proxy"
+fuDOWNLOAD "https://raw.githubusercontent.com/firehol/blocklist-ipsets/master/sslproxies_30d.ipset" "anonymizer" "firehol_sslproxies"
+fuDOWNLOAD "https://iplists.firehol.org/files/cleantalk_30d.ipset" "abuse" "firehol_cleantalk"
+fuDOWNLOAD "https://iplists.firehol.org/files/dshield_30d.netset" "known attacker" "firehol_cleantalk"
+fuDOWNLOAD "https://iplists.firehol.org/files/darklist_de.netset" "known attacker" "firehol_darklist"
+fuDOWNLOAD "https://iplists.firehol.org/files/dm_tor.ipset" "tor exit node" "firehol_dm_tor"
 fuDOWNLOAD "http://danger.rulez.sk/projects/bruteforceblocker/blist.php" "known attacker" "rulez"
 fuDOWNLOAD "http://cinsscore.com/list/ci-badguys.txt" "known attacker" "cinsscore"
+fuDOWNLOAD "https://feodotracker.abuse.ch/blocklist/?download=ipblocklist" "malware" "feodotracker"
 fuDOWNLOAD "https://rules.emergingthreats.net/open/suricata/rules/compromised-ips.txt" "compromised" "et_compromised"
 fuDOWNLOAD "http://blocklist.greensnow.co/greensnow.txt" "known attacker" "greensnow"
 fuDOWNLOAD "http://www.nothink.org/blacklist/blacklist_malware_irc.txt" "malware" "nothink"
-fuDOWNLOAD "http://cybersweat.shop/iprep/iprep_ramnode.txt" "known attacker" "cybersweat"
 fuDOWNLOAD "http://spys.me/proxy.txt" "anonymizer" "spys"
 fuDOWNLOAD "http://ransomwaretracker.abuse.ch/downloads/RW_IPBL.txt" "ransomware" "ransomwaretracker"
 fuDOWNLOAD "https://report.cs.rutgers.edu/DROP/attackers" "known attacker" "rutgers"
 fuDOWNLOAD "http://sblam.com/blacklist.txt" "form spammer" "sblam"
 fuDOWNLOAD "https://sslbl.abuse.ch/blacklist/sslipblacklist.csv" "C2 server" "sslbl"
 fuDOWNLOAD "http://www.talosintelligence.com/feeds/ip-filter.blf" "bad reputation" "talos"
-fuDOWNLOAD "https://check.torproject.org/cgi-bin/TorBulkExitList.py?ip=1.1.1.1" "tor exit node" "torexit"
+fuDOWNLOAD "https://check.torproject.org/exit-addresses" "tor exit node" "torexit"
 fuDOWNLOAD "https://torstatus.blutmagie.de/ip_list_all.php/Tor_ip_list_ALL.csv" "tor exit node" "torip"
 fuDOWNLOAD "https://www.turris.cz/greylist-data/greylist-latest.csv" "bad reputation" "turris"
 fuDOWNLOAD "https://zeustracker.abuse.ch/blocklist.php?download=badips" "malware" "zeustracker"
 fuDOWNLOAD "https://raw.githubusercontent.com/stamparm/maltrail/master/trails/static/mass_scanner.txt" "mass scanner" "maltrail_mass_scanner"
 fuDOWNLOAD "https://myip.ms/files/blacklist/general/full_blacklist_database.zip" "bot, crawler" "myip"
+fuDOWNLOAD "http://www.dnsbl.manitu.net/download/nixspam-ip.dump.gz" "spam" "nix"
 
 # Generate logstash translation map for ip reputation lookup
 echo -n "[ Building translation map ] "
