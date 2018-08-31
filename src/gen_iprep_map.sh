@@ -131,6 +131,13 @@ fuDOWNLOAD "https://zeustracker.abuse.ch/blocklist.php?download=badips" "malware
 fuDOWNLOAD "https://raw.githubusercontent.com/stamparm/maltrail/master/trails/static/mass_scanner.txt" "mass scanner" "maltrail_mass_scanner"
 fuDOWNLOAD "https://myip.ms/files/blacklist/general/full_blacklist_database.zip" "bot, crawler" "myip"
 fuDOWNLOAD "http://www.dnsbl.manitu.net/download/nixspam-ip.dump.gz" "spam" "nix"
+fuDOWNLOAD "http://www.urlvir.com/export-ip-addresses/" "malware" "urlvir"
+fuDOWNLOAD "https://threatintel.stdominics.sa.edu.au/droplist_high_confidence.txt" "known attacker" "threatintel"
+fuDOWNLOAD "https://sslbl.abuse.ch/blacklist/dyre_sslipblacklist_aggressive.csv" "C2 server" "dyre"
+fuDOWNLOAD "http://charles.the-haleys.org/ssh_dico_attack_hdeny_format.php/hostsdeny.txt" "known attacker" "charles"
+fuDOWNLOAD "https://zerodot1.gitlab.io/CoinBlockerLists/MiningServerIPList.txt" "mining node" "coinblocker"
+fuDOWNLOAD "http://www.botvrij.eu/data/ioclist.ip-dst.raw" "bad reputation" "botvrij"
+fuDOWNLOAD "http://www.ipspamlist.com/public_feeds.csv" "known attacker" "spamlist"
 
 # Generate logstash translation map for ip reputation lookup
 echo -n "[ Building translation map ] "
